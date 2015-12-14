@@ -420,6 +420,9 @@ public class NotesFrame extends javax.swing.JFrame {
     public void changeSlideInfo(int currentSlide, int slidesCount, SlideNote note, long previousStart, BufferedImage currentSlideImage, BufferedImage nextSlideImage) {
         this.currentSlideImage = currentSlideImage;
         this.nextSlideImage = nextSlideImage;
+        if (note == null) {
+            note = new SlideNote("", 0);
+        }
         this.note = note;
         this.previousStart = previousStart;
         currentSlideNumberLabel.setText(String.format("%d/%d", currentSlide, slidesCount));
