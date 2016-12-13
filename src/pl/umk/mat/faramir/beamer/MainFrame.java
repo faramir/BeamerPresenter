@@ -374,22 +374,25 @@ public class MainFrame extends javax.swing.JFrame implements KeyEventDispatcher 
                 openFileChooser.setCurrentDirectory(notesFile.getParentFile());
             }
             if (openFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                presentationFileTextField.setText(openFileChooser.getSelectedFile().getAbsolutePath());
                 presentationFile = openFileChooser.getSelectedFile();
-
-                loadPdfFile();
-                startTime = null;
-
-                String name = presentationFile.getName().replaceAll("\\.[^.]*$", ".txt");
-                File guessNotesFile = Paths.get(presentationFile.getParent(), name).toFile();
-                if (guessNotesFile.canRead()) {
-                    notesFile = guessNotesFile;
-                    notesFileTextField.setText(notesFile.getAbsolutePath());
-                    loadTxtFile();
-                }
+                openPresentationFile();
             }
         }
     }//GEN-LAST:event_presentationFileMouseClicked
+
+    private void openPresentationFile() throws HeadlessException {
+        presentationFileTextField.setText(presentationFile.getAbsolutePath());
+
+        loadPdfFile();
+        startTime = null;
+
+        String name = presentationFile.getName().replaceAll("\\.[^.]*$", ".txt");
+        File guessNotesFile = Paths.get(presentationFile.getParent(), name).toFile();
+        if (guessNotesFile.canRead()) {
+            notesFile = guessNotesFile;
+            openNotesFile();
+        }
+    }
 
     private void notesFileTextFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_notesFileTextFieldMouseClicked
         if (evt.getClickCount() >= 2) {
@@ -402,14 +405,17 @@ public class MainFrame extends javax.swing.JFrame implements KeyEventDispatcher 
                 openFileChooser.setSelectedFile(notesFile);
                 if (openFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                     notesFile = openFileChooser.getSelectedFile();
-                    notesFileTextField.setText(notesFile.getAbsolutePath());
-                    loadTxtFile();
+                    openNotesFile();
                 }
             }
             checkStartPresentationButtonEnabled();
         }
     }//GEN-LAST:event_notesFileTextFieldMouseClicked
 
+    private void openNotesFile() throws HeadlessException {
+        notesFileTextField.setText(notesFile.getAbsolutePath());
+        loadTxtFile();
+    }
 
     private void presentationScreenRefreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_presentationScreenRefreshButtonActionPerformed
         presentationScreenComboBox.removeAllItems();
@@ -651,6 +657,19 @@ public class MainFrame extends javax.swing.JFrame implements KeyEventDispatcher 
         }
         MainFrame mainFrame = new MainFrame();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(mainFrame);
+
+        if (args.length > 0) {
+            try {
+                mainFrame.presentationFile = Paths.get(args[0]).toFile();
+                mainFrame.openPresentationFile();
+                if (args.length > 1) {
+                    mainFrame.notesFile = Paths.get(args[1]).toFile();
+                    mainFrame.openNotesFile();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
 
         java.awt.EventQueue.invokeLater(() -> mainFrame.setVisible(true));
     }
